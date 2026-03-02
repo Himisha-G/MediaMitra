@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { signOut } from "aws-amplify/auth"
+import { useRouter } from "next/navigation"
 
 interface EventItem {
   id: string
@@ -58,19 +60,15 @@ const sampleEvents: EventItem[] = [
   },
 ]
 
-interface EventManagerDashboardProps {
-  userEmail: string
-  onLogout: () => void
-}
+export function EventManagerDashboard() {
+  const router = useRouter()
 
-export function EventManagerDashboard({
-  userEmail,
-  onLogout,
-}: EventManagerDashboardProps) {
   const [events, setEvents] = useState<EventItem[]>(sampleEvents)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [filter, setFilter] = useState<"all" | "upcoming" | "completed" | "cancelled">("all")
+  const [filter, setFilter] =
+    useState<"all" | "upcoming" | "completed" | "cancelled">("all")
+
   const [form, setForm] = useState({
     title: "",
     date: "",
@@ -78,6 +76,11 @@ export function EventManagerDashboard({
     location: "",
     description: "",
   })
+
+  const handleLogout = async () => {
+    await signOut()
+    router.replace("/login")
+  }
 
   const resetForm = () => {
     setForm({ title: "", date: "", time: "", location: "", description: "" })
@@ -91,7 +94,7 @@ export function EventManagerDashboard({
     if (editingId) {
       setEvents((prev) =>
         prev.map((e) =>
-          e.id === editingId ? { ...e, ...form, status: e.status } : e
+          e.id === editingId ? { ...e, ...form } : e
         )
       )
     } else {
@@ -102,6 +105,7 @@ export function EventManagerDashboard({
       }
       setEvents((prev) => [...prev, newEvent])
     }
+
     resetForm()
   }
 
@@ -140,6 +144,7 @@ export function EventManagerDashboard({
   return (
     <div className="px-6 py-8">
       <div className="mx-auto max-w-5xl">
+
         {/* Header */}
         <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
@@ -147,23 +152,34 @@ export function EventManagerDashboard({
               Event Manager
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Logged in as{" "}
-              <span className="text-primary">{userEmail}</span>
+              Manage your events efficiently
             </p>
           </div>
+
           <div className="flex items-center gap-3">
             <Button
               onClick={() => {
                 setShowForm(true)
                 setEditingId(null)
-                setForm({ title: "", date: "", time: "", location: "", description: "" })
+                setForm({
+                  title: "",
+                  date: "",
+                  time: "",
+                  location: "",
+                  description: "",
+                })
               }}
               className="rounded-xl"
             >
               <Plus className="mr-2 h-4 w-4" />
               New Event
             </Button>
-            <Button variant="outline" onClick={onLogout} className="rounded-xl">
+
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="rounded-xl"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Log Out
             </Button>
@@ -172,109 +188,23 @@ export function EventManagerDashboard({
 
         {/* Filters */}
         <div className="mb-6 flex flex-wrap gap-2">
-          {(["all", "upcoming", "completed", "cancelled"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={cn(
-                "rounded-lg px-4 py-2 text-sm font-medium capitalize transition-colors",
-                filter === f
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              )}
-            >
-              {f}
-            </button>
-          ))}
+          {(["all", "upcoming", "completed", "cancelled"] as const).map(
+            (f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={cn(
+                  "rounded-lg px-4 py-2 text-sm font-medium capitalize transition-colors",
+                  filter === f
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                )}
+              >
+                {f}
+              </button>
+            )
+          )}
         </div>
-
-        {/* Event Form */}
-        {showForm && (
-          <Card className="mb-6 border-border bg-card">
-            <CardContent className="p-6">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-[var(--font-heading)] text-lg font-semibold text-foreground">
-                  {editingId ? "Edit Event" : "Create New Event"}
-                </h3>
-                <button
-                  onClick={resetForm}
-                  className="text-muted-foreground hover:text-foreground"
-                  aria-label="Close form"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="flex flex-col gap-2 sm:col-span-2">
-                  <Label htmlFor="event-title">Event Title</Label>
-                  <Input
-                    id="event-title"
-                    value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    placeholder="e.g., YouTube Live Stream"
-                    className="bg-background"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="event-date">Date</Label>
-                  <Input
-                    id="event-date"
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    className="bg-background"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="event-time">Time</Label>
-                  <Input
-                    id="event-time"
-                    type="time"
-                    value={form.time}
-                    onChange={(e) => setForm({ ...form, time: e.target.value })}
-                    className="bg-background"
-                  />
-                </div>
-                <div className="flex flex-col gap-2 sm:col-span-2">
-                  <Label htmlFor="event-location">Location</Label>
-                  <Input
-                    id="event-location"
-                    value={form.location}
-                    onChange={(e) =>
-                      setForm({ ...form, location: e.target.value })
-                    }
-                    placeholder="e.g., Zoom, YouTube Studio"
-                    className="bg-background"
-                  />
-                </div>
-                <div className="flex flex-col gap-2 sm:col-span-2">
-                  <Label htmlFor="event-desc">Description</Label>
-                  <Input
-                    id="event-desc"
-                    value={form.description}
-                    onChange={(e) =>
-                      setForm({ ...form, description: e.target.value })
-                    }
-                    placeholder="Brief description"
-                    className="bg-background"
-                  />
-                </div>
-              </div>
-              <div className="mt-4 flex justify-end gap-3">
-                <Button variant="outline" onClick={resetForm} className="rounded-xl">
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  disabled={!form.title || !form.date}
-                  className="rounded-xl"
-                >
-                  {editingId ? "Update" : "Create"} Event
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Events List */}
         <div className="flex flex-col gap-4">
@@ -299,33 +229,31 @@ export function EventManagerDashboard({
                     <button
                       onClick={() => handleStatusToggle(event.id)}
                       className={cn(
-                        "mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border-2 transition-colors",
+                        "mt-1 flex h-6 w-6 items-center justify-center rounded-md border-2 transition-colors",
                         event.status === "completed"
                           ? "border-primary bg-primary"
                           : "border-border hover:border-primary"
                       )}
-                      aria-label={
-                        event.status === "completed"
-                          ? "Mark as upcoming"
-                          : "Mark as completed"
-                      }
                     >
                       {event.status === "completed" && (
                         <Check className="h-4 w-4 text-primary-foreground" />
                       )}
                     </button>
+
                     <div>
                       <h4
                         className={cn(
-                          "font-[var(--font-heading)] font-semibold text-foreground",
+                          "font-semibold text-foreground",
                           event.status === "completed" && "line-through"
                         )}
                       >
                         {event.title}
                       </h4>
+
                       <p className="mt-1 text-sm text-muted-foreground">
                         {event.description}
                       </p>
+
                       <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
@@ -346,21 +274,21 @@ export function EventManagerDashboard({
                       </div>
                     </div>
                   </div>
+
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(event)}
-                      aria-label="Edit event"
-                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                      className="h-8 w-8"
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>
+
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(event.id)}
-                      aria-label="Delete event"
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />

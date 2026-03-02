@@ -1,16 +1,16 @@
 "use client"
-
+import { signIn } from "aws-amplify/auth"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { LogIn, Mail, Lock, Eye, EyeOff, User as UserIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-interface LoginFormProps {
-  onLogin: (email: string) => void
-}
 
-export function LoginForm({ onLogin }: LoginFormProps) {
+
+export function LoginForm() {
+  const router = useRouter()
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -18,25 +18,21 @@ export function LoginForm({ onLogin }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-
+  
     if (!email || !password) {
       setError("Please fill in all fields.")
       return
     }
-    if (isSignUp && !name) {
-      setError("Please enter your name.")
-      return
+  
+    try {
+      await signIn({ username: email, password })
+      router.replace("/events")
+    } catch (err: any) {
+      setError(err.message || "Login failed.")
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.")
-      return
-    }
-
-    // Client-side demo login
-    onLogin(email)
   }
 
   return (
