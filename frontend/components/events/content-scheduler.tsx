@@ -152,18 +152,15 @@ return[
 
 },[events])
 
-const burnoutScore = useMemo(()=>{
+const completionRate = useMemo(() => {
 
-if(events.length===0) return 20
-
-const missed = stats[0].value
-const completed = stats[1].value
-
-const ratio = completed / (completed + missed + 1)
-
-return Math.round((1-ratio)*100)
-
-},[stats,events])
+    if(events.length === 0) return 0
+    
+    const completed = stats.find(s => s.name === "completed")?.value || 0
+    
+    return Math.round((completed / events.length) * 100)
+    
+    }, [events, stats])
 
 const consistencyScore = useMemo(()=>{
 
@@ -236,15 +233,17 @@ className="border rounded-lg p-3 bg-background"
 <input
 type="date"
 value={date}
+onFocus={(e)=> (e.target as HTMLInputElement).showPicker?.()}
 onChange={(e)=>setDate(e.target.value)}
-className="border rounded-lg p-3 bg-background"
+className="border rounded-lg p-3 bg-background cursor-pointer"
 />
 
 <input
 type="time"
 value={time}
+onFocus={(e)=> (e.target as HTMLInputElement).showPicker?.()}
 onChange={(e)=>setTime(e.target.value)}
-className="border rounded-lg p-3 bg-background"
+className="border rounded-lg p-3 bg-background cursor-pointer"
 />
 
 <select
@@ -427,24 +426,32 @@ return <Cell key={index} fill={fill} />
 </div>
 
 
-{/* BURNOUT GAUGE */}
+{/* Completion Rate */}
 
 <div className="bg-card border rounded-xl p-6 flex flex-col items-center">
 
 <h3 className="font-semibold mb-4">
-Burnout Risk
+Completion Rate
 </h3>
 
 <GaugeComponent
-value={burnoutScore}
+value={completionRate}
 type="semicircle"
 arc={{
-colorArray:["#22c55e","#facc15","#ef4444"],
+colorArray:["#ef4444","#facc15","#22c55e"],
 padding:0.02,
-subArcs:[{limit:30},{limit:70},{}]
+subArcs:[
+{limit:40},
+{limit:75},
+{}
+]
 }}
 pointer={{elastic:true}}
-labels={{valueLabel:{formatTextValue:v=>v+"%"}}}
+labels={{
+valueLabel:{
+formatTextValue:v=>v+"%"
+}
+}}
 />
 
 </div>
