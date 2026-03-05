@@ -16,8 +16,14 @@ Amplify.configure({
           // Matches the 'OpenID Connect scopes' in your AWS Console screenshot
           scopes: ["openid", "email", "phone"], 
           // Matches the 'Allowed callback/sign-out URLs' in your AWS Console screenshot
-          redirectSignIn: ["http://localhost:3000/"], 
-          redirectSignOut: ["http://localhost:3000/"],
+          redirectSignIn: [
+            "http://localhost:3000/",
+            "https://main.d2jguayobfxt6q.amplifyapp.com/"
+          ],
+          redirectSignOut: [
+            "http://localhost:3000/",
+            "https://main.d2jguayobfxt6q.amplifyapp.com/"
+          ],
           responseType: "code"
         }
       }
