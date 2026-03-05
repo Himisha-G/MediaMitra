@@ -203,7 +203,10 @@ export function ContentScheduler({ goBack }: { goBack: () => void }) {
               </div>
 
               <p className="text-sm text-muted-foreground">
-                {new Date(e.time).toLocaleString()}
+                {new Date(e.time).toLocaleString(undefined, {
+  dateStyle: "medium",
+  timeStyle: "short",
+})}
               </p>
             </div>
           ))}
