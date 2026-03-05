@@ -32,7 +32,7 @@ const [date, setDate] = useState("")
 const [time, setTime] = useState("")
 const [platform, setPlatform] = useState("YouTube")
 const [loading, setLoading] = useState(false)
-
+const [toast, setToast] = useState<string | null>(null)
 useEffect(() => {
 loadEvents()
 }, [])
@@ -68,7 +68,11 @@ return {...e,status:"missed"}
 return e
 
 })
-
+parsed.sort(
+    (a,b)=>
+    new Date(a.time).getTime() - new Date(b.time).getTime()
+    )
+    
 setEvents(parsed)
 
 } catch(err){
@@ -111,7 +115,8 @@ setDate("")
 setTime("")
 
 await loadEvents()
-
+setToast("✅ Content scheduled. 📧 Confirmation email sent.")
+setTimeout(() => setToast(null), 3000)
 }catch(err){
 console.error(err)
 }
@@ -120,17 +125,28 @@ setLoading(false)
 
 }
 
-function markCompleted(id:string){
-
-setEvents(prev =>
-prev.map(e =>
-e.id === id
-? {...e,status:"completed"}
-: e
-)
-)
-
-}
+const markCompleted = async (id: string) => {
+    try {
+  
+      const token = (await fetchAuthSession()).tokens?.idToken?.toString()
+  
+      await fetch(`${process.env.NEXT_PUBLIC_EVENTS_API}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          id: id
+        })
+      })
+  
+      await loadEvents()
+  
+    } catch (err) {
+      console.error("Failed to mark completed", err)
+    }
+  }
 
 const stats = useMemo(()=>{
 
@@ -315,10 +331,10 @@ timeStyle:"short"
 {e.status!=="completed" && (
 
 <button
-onClick={()=>markCompleted(e.id)}
-className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-lg"
+  onClick={() => markCompleted(e.id)}
+  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
 >
-Mark Completed
+  Mark Completed
 </button>
 
 )}
@@ -485,7 +501,11 @@ style={{width:`${consistencyScore}%`}}
 </div>
 
 </div>
-
+{toast && (
+      <div className="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg">
+        {toast}
+      </div>
+    )}
 </div>
 
 )
