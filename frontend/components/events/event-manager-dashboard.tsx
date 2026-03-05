@@ -1,12 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar, Trophy, Brain } from "lucide-react"
+import { Calendar, Trophy } from "lucide-react"
 import { ContentScheduler } from "./content-scheduler"
 import { ChallengeTracker } from "./challenge-tracker"
-import { ContentStrategizer } from "./content-strategizer"
 
-type View = "home" | "scheduler" | "challenge" | "strategizer"
+type View = "home" | "scheduler" | "challenge"
 
 export function EventManagerDashboard() {
 
@@ -14,28 +13,27 @@ export function EventManagerDashboard() {
 
   if (view === "scheduler") return <ContentScheduler goBack={()=>setView("home")} />
   if (view === "challenge") return <ChallengeTracker goBack={()=>setView("home")} />
-  if (view === "strategizer") return <ContentStrategizer goBack={()=>setView("home")} />
 
   return (
-    <div className="px-6 py-10">
+    <div className="px-6 py-16 flex justify-center">
 
-      <div className="mx-auto max-w-5xl">
+      <div className="w-full max-w-4xl">
 
-        <h1 className="text-3xl font-bold mb-6">
+        <h1 className="text-4xl font-bold text-center mb-4">
           Creator Event Manager
         </h1>
 
-        <p className="text-muted-foreground mb-10">
+        <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
           Plan your content schedule, track consistency challenges, and analyze your strategy.
         </p>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-8">
 
           <button
             onClick={()=>setView("scheduler")}
-            className="p-6 rounded-xl border hover:bg-muted transition"
+            className="p-8 rounded-xl border flex flex-col items-center text-center hover:bg-muted transition"
           >
-            <Calendar className="mb-3"/>
+            <Calendar className="w-8 h-8 mb-4"/>
             <h3 className="font-semibold">Content Scheduler</h3>
             <p className="text-sm text-muted-foreground">
               Plan posts, schedule reminders, and manage upcoming uploads.
@@ -44,23 +42,12 @@ export function EventManagerDashboard() {
 
           <button
             onClick={()=>setView("challenge")}
-            className="p-6 rounded-xl border hover:bg-muted transition"
+            className="p-8 rounded-xl border flex flex-col items-center text-center hover:bg-muted transition"
           >
-            <Trophy className="mb-3"/>
+            <Trophy className="w-8 h-8 mb-4"/>
             <h3 className="font-semibold">Challenge Tracker</h3>
             <p className="text-sm text-muted-foreground">
               Build consistency with daily posting challenges.
-            </p>
-          </button>
-
-          <button
-            onClick={()=>setView("strategizer")}
-            className="p-6 rounded-xl border hover:bg-muted transition"
-          >
-            <Brain className="mb-3"/>
-            <h3 className="font-semibold">Content Strategizer</h3>
-            <p className="text-sm text-muted-foreground">
-              AI insights on performance and content strategy.
             </p>
           </button>
 
