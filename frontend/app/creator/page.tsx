@@ -28,10 +28,7 @@ export default function CreatorPage() {
     <>
       <Navbar />
       <main className="pt-[73px] min-h-screen bg-[#0a0a0a]">
-        {/* Ensure your ChatInterface component is set up to accept 
-          an 'onAction' or similar prop if you want to trigger 
-          niche discovery from a button outside the chat box.
-        */}
+        {}
         <ChatInterface />
       </main>
     </>

@@ -2,7 +2,7 @@
 
 import { Navbar } from "@/components/navbar"
 import { EventManagerDashboard } from "@/components/events/event-manager-dashboard"
-import { useAuthGuard } from "../../hooks/useAuthGuard"
+import { useAuthGuard } from "@/hooks/useAuthGuard"
 
 export default function EventsPage() {
   useAuthGuard()
