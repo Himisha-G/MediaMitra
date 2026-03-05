@@ -1,5 +1,5 @@
 "use client"
-
+import { Cell } from "recharts"
 import { useEffect, useMemo, useState } from "react"
 import { fetchAuthSession } from "aws-amplify/auth"
 import {
@@ -349,17 +349,74 @@ Content Performance
 
 <ResponsiveContainer>
 
-<BarChart data={stats}>
+<BarChart
+data={stats}
+margin={{ top: 10, right: 20, left: -10, bottom: 0 }}
+>
 
-<CartesianGrid strokeDasharray="3 3"/>
+<defs>
 
-<XAxis dataKey="name"/>
+<linearGradient id="missed" x1="0" y1="0" x2="0" y2="1">
+<stop offset="5%" stopColor="#ef4444" stopOpacity={0.9}/>
+<stop offset="95%" stopColor="#ef4444" stopOpacity={0.2}/>
+</linearGradient>
 
-<YAxis/>
+<linearGradient id="completed" x1="0" y1="0" x2="0" y2="1">
+<stop offset="5%" stopColor="#22c55e" stopOpacity={0.9}/>
+<stop offset="95%" stopColor="#22c55e" stopOpacity={0.2}/>
+</linearGradient>
 
-<Tooltip/>
+<linearGradient id="scheduled" x1="0" y1="0" x2="0" y2="1">
+<stop offset="5%" stopColor="#facc15" stopOpacity={0.9}/>
+<stop offset="95%" stopColor="#facc15" stopOpacity={0.2}/>
+</linearGradient>
 
-<Bar dataKey="value"/>
+</defs>
+
+<CartesianGrid
+strokeDasharray="3 3"
+stroke="#444"
+/>
+
+<XAxis
+dataKey="name"
+tick={{ fill: "#9ca3af" }}
+axisLine={false}
+tickLine={false}
+/>
+
+<YAxis
+tick={{ fill: "#9ca3af" }}
+axisLine={false}
+tickLine={false}
+/>
+
+<Tooltip
+contentStyle={{
+background:"#111",
+border:"1px solid #333",
+borderRadius:"8px"
+}}
+/>
+
+<Bar
+dataKey="value"
+radius={[6,6,0,0]}
+animationDuration={800}
+>
+
+{stats.map((entry, index) => {
+
+let fill = "url(#scheduled)"
+
+if(entry.name === "missed") fill = "url(#missed)"
+if(entry.name === "completed") fill = "url(#completed)"
+
+return <Cell key={index} fill={fill} />
+
+})}
+
+</Bar>
 
 </BarChart>
 
