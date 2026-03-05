@@ -1,217 +1,300 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { fetchAuthSession } from "aws-amplify/auth"
+import {
+BarChart,
+Bar,
+XAxis,
+YAxis,
+Tooltip,
+ResponsiveContainer,
+CartesianGrid
+} from "recharts"
 
 const API = process.env.NEXT_PUBLIC_EVENTS_API || ""
 
 interface EventItem {
-  id: string
-  title: string
-  topic?: string
-  platform: string
-  time: string
-  status: string
+id: string
+title: string
+platform: string
+time: string
+status: "scheduled" | "completed" | "missed"
 }
 
 export function ContentScheduler({ goBack }: { goBack: () => void }) {
-  const [events, setEvents] = useState<EventItem[]>([])
-  const [title, setTitle] = useState("")
-  const [date, setDate] = useState("")
-  const [time, setTime] = useState("")
-  const [platform, setPlatform] = useState("YouTube")
-  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    loadEvents()
-  }, [])
+const [events, setEvents] = useState<EventItem[]>([])
+const [title, setTitle] = useState("")
+const [date, setDate] = useState("")
+const [time, setTime] = useState("")
+const [platform, setPlatform] = useState("YouTube")
+const [loading, setLoading] = useState(false)
 
-  async function loadEvents() {
-    try {
-      const session = await fetchAuthSession()
-      const token = session.tokens?.idToken?.toString()
+useEffect(() => {
+loadEvents()
+}, [])
 
-      const res = await fetch(API, {
-        headers: {
-          Authorization: token!
-        }
-      })
+async function loadEvents() {
 
-      const data = await res.json()
+try {
 
-      if (Array.isArray(data)) {
-        setEvents(data)
-      } else if (data.body) {
-        setEvents(JSON.parse(data.body))
-      } else {
-        setEvents([])
-      }
-    } catch (err) {
-      console.error("Load events error:", err)
-      setEvents([])
-    }
-  }
+const session = await fetchAuthSession()
+const token = session.tokens?.idToken?.toString()
 
-  async function createEvent() {
-    if (!title || !date || !time) {
-      alert("Please fill all fields")
-      return
-    }
+const res = await fetch(API, {
+headers: { Authorization: token! }
+})
 
-    setLoading(true)
+const data = await res.json()
 
-    try {
-      const session = await fetchAuthSession()
-      const token = session.tokens?.idToken?.toString()
+let parsed: EventItem[] = []
 
-      const isoTime = new Date(`${date}T${time}`).toISOString()
+if (Array.isArray(data)) parsed = data
+else if (data.body) parsed = JSON.parse(data.body)
 
-      const payload = {
-        title,
-        topic: title,
-        platform,
-        time: isoTime
-      }
+const now = new Date()
 
-      const res = await fetch(API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token!
-        },
-        body: JSON.stringify(payload)
-      })
+parsed = parsed.map((e) => {
 
-      await res.json()
+if (e.status === "completed") return e
 
-      setTitle("")
-      setDate("")
-      setTime("")
-      setPlatform("YouTube")
+const eventTime = new Date(e.time)
 
-      await loadEvents()
-    } catch (err) {
-      console.error("Create event error:", err)
-      alert("Event creation failed")
-    }
+if (eventTime < now) {
+return { ...e, status: "missed" }
+}
 
-    setLoading(false)
-  }
+return e
 
-  function platformColor(p: string) {
-    if (p === "YouTube") return "bg-red-500/20 text-red-400"
-    if (p === "Instagram") return "bg-pink-500/20 text-pink-400"
-    if (p === "Shorts") return "bg-yellow-500/20 text-yellow-400"
-    if (p === "TikTok") return "bg-cyan-500/20 text-cyan-400"
+})
 
-    return "bg-gray-500/20 text-gray-400"
-  }
+setEvents(parsed)
 
-  return (
-    <div className="max-w-6xl mx-auto space-y-10 px-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={goBack}
-          className="text-sm text-muted-foreground hover:text-white"
-        >
-          ← Back
-        </button>
+} catch (err) {
+console.error("Load events error", err)
+}
 
-        <h2 className="text-3xl font-semibold">Content Scheduler</h2>
-      </div>
+}
 
-      {/* Schedule Form */}
-      <div className="bg-card border rounded-xl p-6 space-y-4">
-        <h3 className="text-lg font-semibold">Schedule New Content</h3>
+async function createEvent() {
 
-        <div className="grid md:grid-cols-4 gap-4">
-          <input
-            placeholder="Content title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border rounded-lg p-3 bg-background"
-          />
+if (!title || !date || !time) {
+alert("Fill all fields")
+return
+}
 
-          <input
-            type="date"
-            value={date}
-            onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            onChange={(e) => setDate(e.target.value)}
-            className="border rounded-lg p-3 bg-background cursor-pointer"
-          />
+setLoading(true)
 
-          <input
-            type="time"
-            value={time}
-            onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            onChange={(e) => setTime(e.target.value)}
-            className="border rounded-lg p-3 bg-background cursor-pointer"
-          />
+try {
 
-          <select
-            value={platform}
-            onChange={(e) => setPlatform(e.target.value)}
-            className="border rounded-lg p-3 bg-background"
-          >
-            <option>YouTube</option>
-            <option>Instagram</option>
-            <option>Shorts</option>
-            <option>TikTok</option>
-          </select>
-        </div>
+const session = await fetchAuthSession()
+const token = session.tokens?.idToken?.toString()
 
-        <button
-          onClick={createEvent}
-          disabled={loading}
-          className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium"
-        >
-          {loading ? "Scheduling..." : "Schedule Content"}
-        </button>
-      </div>
+const isoTime = new Date(`${date}T${time}`).toISOString()
 
-      {/* Events List */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Upcoming Content</h3>
+const payload = {
+title,
+platform,
+time: isoTime
+}
 
-        {events.length === 0 && (
-          <div className="text-center py-10 text-muted-foreground border rounded-lg">
-            No scheduled content yet.
-          </div>
-        )}
+await fetch(API, {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+Authorization: token!
+},
+body: JSON.stringify(payload)
+})
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {events.map((e) => (
-            <div
-              key={e.id}
-              className="border rounded-xl p-5 bg-card hover:border-primary transition"
-            >
-              <h4 className="font-semibold text-lg mb-2">{e.title}</h4>
+setTitle("")
+setDate("")
+setTime("")
 
-              <div className="flex items-center justify-between mb-3">
-                <span
-                  className={`text-xs px-3 py-1 rounded-full ${platformColor(
-                    e.platform
-                  )}`}
-                >
-                  {e.platform}
-                </span>
+await loadEvents()
 
-                <span className="text-xs text-muted-foreground">
-                  {e.status}
-                </span>
-              </div>
+} catch (err) {
+console.error(err)
+}
 
-              <p className="text-sm text-muted-foreground">
-                {new Date(e.time).toLocaleString(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-})}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
+setLoading(false)
+
+}
+
+function markCompleted(id: string) {
+
+setEvents((prev) =>
+prev.map((e) =>
+e.id === id
+? { ...e, status: "completed" }
+: e
+)
+)
+
+}
+
+const stats = useMemo(() => {
+
+let completed = 0
+let missed = 0
+let scheduled = 0
+
+events.forEach((e) => {
+
+if (e.status === "completed") completed++
+else if (e.status === "missed") missed++
+else scheduled++
+
+})
+
+return [
+{ name: "missed", value: missed },
+{ name: "completed", value: completed },
+{ name: "scheduled", value: scheduled }
+]
+
+}, [events])
+
+return (
+
+<div className="max-w-7xl mx-auto space-y-8 px-6">
+
+<div className="flex justify-between items-center">
+
+<button
+onClick={goBack}
+className="text-sm text-muted-foreground"
+>
+← Back
+</button>
+
+<h2 className="text-3xl font-semibold">
+Content Scheduler
+</h2>
+
+</div>
+
+{/* Schedule form */}
+
+<div className="grid md:grid-cols-4 gap-4">
+
+<input
+placeholder="Content title"
+value={title}
+onChange={(e) => setTitle(e.target.value)}
+className="border rounded-lg p-3"
+/>
+
+<input
+type="date"
+value={date}
+onChange={(e) => setDate(e.target.value)}
+className="border rounded-lg p-3"
+/>
+
+<input
+type="time"
+value={time}
+onChange={(e) => setTime(e.target.value)}
+className="border rounded-lg p-3"
+/>
+
+<select
+value={platform}
+onChange={(e) => setPlatform(e.target.value)}
+className="border rounded-lg p-3"
+>
+<option>YouTube</option>
+<option>Instagram</option>
+<option>Shorts</option>
+<option>TikTok</option>
+</select>
+
+</div>
+
+<button
+onClick={createEvent}
+disabled={loading}
+className="bg-teal-500 text-white px-6 py-3 rounded-lg"
+>
+{loading ? "Scheduling..." : "Schedule Content"}
+</button>
+
+{/* Analytics */}
+
+<div className="border rounded-xl p-6">
+
+<h3 className="font-semibold mb-4">
+Content Performance
+</h3>
+
+<div style={{ width: "100%", height: 250 }}>
+
+<ResponsiveContainer>
+
+<BarChart data={stats}>
+
+<CartesianGrid strokeDasharray="3 3" />
+
+<XAxis dataKey="name" />
+
+<YAxis />
+
+<Tooltip />
+
+<Bar dataKey="value" />
+
+</BarChart>
+
+</ResponsiveContainer>
+
+</div>
+
+</div>
+
+{/* Events */}
+
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+{events.map((e) => (
+
+<div
+key={e.id}
+className="border rounded-xl p-5 space-y-3"
+>
+
+<h3 className="font-semibold text-lg">
+{e.title}
+</h3>
+
+<p>Platform: {e.platform}</p>
+
+<p>Status: {e.status}</p>
+
+<p>
+Time: {new Date(e.time).toLocaleString()}
+</p>
+
+{e.status !== "completed" && (
+
+<button
+onClick={() => markCompleted(e.id)}
+className="bg-green-500 text-white px-4 py-2 rounded"
+>
+Mark Completed
+</button>
+
+)}
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)
+
 }
