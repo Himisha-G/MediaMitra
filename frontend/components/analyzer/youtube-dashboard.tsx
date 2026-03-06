@@ -1,15 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Globe, User } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
 import { YoutubePublicDashboard } from "./youtube-public-dashboard"
-
+import { YoutubePrivate } from "./youtube-private"
 type View = "home" | "public" | "private"
 
 export function YoutubeDashboard() {
   const [view, setView] = useState<View>("home")
+
+  useEffect(() => {
+
+    if (window.location.search.includes("yt=connected")) {
+
+      setView("private")
+
+      window.history.replaceState({}, "", "/analyzer")
+
+    }
+
+  }, [])
+
 
   if (view === "public") {
     return (
@@ -29,7 +42,8 @@ export function YoutubeDashboard() {
 
   if (view === "private") {
     return (
-      <div className="p-6">
+      <div>
+  
         <button
           className="mb-4 flex items-center gap-2 text-sm text-muted-foreground"
           onClick={() => setView("home")}
@@ -37,18 +51,13 @@ export function YoutubeDashboard() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </button>
-
-        <h2 className="text-2xl font-bold mb-2">
-          Private Channel Analysis
-        </h2>
-
-        <p className="text-muted-foreground">
-          Connect your YouTube channel using OAuth to analyze
-          watch time, CTR, retention and subscriber insights.
-        </p>
+  
+        <YoutubePrivate />
+  
       </div>
     )
   }
+
 
   return (
     <div className="px-6 py-8">
