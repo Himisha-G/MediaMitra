@@ -1,15 +1,15 @@
 "use client"
 
+import { FaPinterest, FaSpotify } from "react-icons/fa"
 import { useState } from "react"
-import { YoutubeIcon, Instagram, Twitter, MessageSquare } from "lucide-react"
+import { YoutubeIcon, Instagram, MessageSquare } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
 import { YoutubeDashboard } from "./youtube-dashboard"
-
 import { RedditDashboard } from "./reddit-dashboard"
-import { InstagramDashboard } from "./instagram-dashboard"
+import { PinterestDashboard } from "./pinterest-dashboard"
 
-type Platform = "youtube" | "x" | "reddit" | "instagram" | null
+type Platform = "youtube" | "pinterest" | "reddit" | "instagram" | "spotify" | null
 
 const platforms = [
   {
@@ -19,10 +19,10 @@ const platforms = [
     description: "Analyze video engagement, comments and performance",
   },
   {
-    name: "X (Twitter)",
-    icon: Twitter,
-    key: "x",
-    description: "Analyze tweets, engagement and sentiment",
+    name: "Pinterest",
+    icon: FaPinterest,
+    key: "pinterest",
+    description: "Analyze trending products, creators and viral topics",
   },
   {
     name: "Reddit",
@@ -34,8 +34,14 @@ const platforms = [
     name: "Instagram",
     icon: Instagram,
     key: "instagram",
-    description: "Analyze reels, posts and audience engagement",
+    description: "Analyze reels, posts and engagement",
   },
+  {
+    name: "Spotify",
+    icon: FaSpotify,
+    key: "spotify",
+    description: "Analyze tracks, playlists and listener growth",
+  }
 ]
 
 export function AnalyzerDashboard() {
@@ -43,14 +49,14 @@ export function AnalyzerDashboard() {
 
   if (activePlatform === "youtube") return <YoutubeDashboard />
   if (activePlatform === "reddit") return <RedditDashboard />
-  if (activePlatform === "instagram") return <InstagramDashboard />
+  if (activePlatform === "pinterest") return <PinterestDashboard />
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-6 py-10">
       <div className="mx-auto max-w-6xl">
 
-        <h1 className="text-3xl font-bold mb-6">
-          Social Media Analyzer
+        <h1 className="text-4xl font-bold mb-8">
+          MediaMitra Social Analyzer
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -61,12 +67,12 @@ export function AnalyzerDashboard() {
             return (
               <Card
                 key={platform.name}
-                className="cursor-pointer hover:shadow-lg transition"
+                className="cursor-pointer hover:shadow-xl hover:scale-[1.02] transition"
                 onClick={() => setActivePlatform(platform.key as Platform)}
               >
                 <CardContent className="flex items-center gap-4 p-6">
 
-                  <Icon className="h-8 w-8 text-primary" />
+                  <Icon className="h-9 w-9 text-primary" />
 
                   <div>
                     <h2 className="font-semibold text-lg">
