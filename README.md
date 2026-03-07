@@ -1,4 +1,6 @@
-# 🔐 Authentication
+MediaMitra
+
+Auhtentication
 
 After entering the **MediaMitra Home Page**, users securely log in using **AWS Cognito Authentication**.
 
