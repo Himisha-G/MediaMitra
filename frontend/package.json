@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint ."
-  },
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "eslint ."
+},
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1003.0",
     "@aws-sdk/lib-dynamodb": "^3.1003.0",
