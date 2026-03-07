@@ -1,22 +1,20 @@
 "use client"
 
-console.log("YoutubePrivate rendered")
-
 import { useEffect, useState } from "react"
 import { fetchAuthSession } from "aws-amplify/auth"
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer
+LineChart,
+Line,
+XAxis,
+YAxis,
+Tooltip,
+ResponsiveContainer
 } from "recharts"
 
 export function YoutubePrivate(){
 
 const [userId,setUserId] = useState<string|null>(null)
-const [connected,setConnected] = useState(false)
+const [connected,setConnected] = useState<boolean | null>(null)
 const [data,setData] = useState<any>(null)
 const [loading,setLoading] = useState(true)
 
@@ -24,17 +22,30 @@ useEffect(()=>{
 
 async function init(){
 
+try{
+
 const session = await fetchAuthSession()
 const payload = session.tokens?.idToken?.payload
 const sub = payload?.sub as string
 
-if(!sub) return
+if(!sub){
+setLoading(false)
+setConnected(false)
+return
+}
 
 setUserId(sub)
 
 /* CHECK CONNECTION */
 
 const statusRes = await fetch(`/api/youtube/status?user_id=${sub}`)
+
+if(!statusRes.ok){
+setConnected(false)
+setLoading(false)
+return
+}
+
 const status = await statusRes.json()
 
 if(!status.connected){
@@ -43,14 +54,24 @@ setLoading(false)
 return
 }
 
+/* CONNECTED */
+
 setConnected(true)
 
 /* LOAD ANALYTICS */
 
 const analyticsRes = await fetch(`/api/youtube/analytics?user_id=${sub}`)
-const analytics = await analyticsRes.json()
 
+if(analyticsRes.ok){
+const analytics = await analyticsRes.json()
 setData(analytics)
+}
+
+}catch(err){
+console.error("YoutubePrivate error:",err)
+setConnected(false)
+}
+
 setLoading(false)
 
 }
@@ -59,16 +80,26 @@ init()
 
 },[])
 
+/* CONNECT BUTTON */
+
 const connectYoutube = ()=>{
 if(!userId) return
 window.location.href = `/api/youtube/auth?user_id=${userId}`
 }
 
+/* LOADING */
+
 if(loading){
-return <div className="p-6">Loading analytics...</div>
+return(
+<div className="p-6">
+Loading YouTube analytics...
+</div>
+)
 }
 
-if(!connected){
+/* NOT CONNECTED */
+
+if(connected !== true){
 
 return(
 
@@ -78,15 +109,15 @@ return(
 Private YouTube Analytics
 </h2>
 
-<div className="border rounded-xl p-6 flex flex-col items-center gap-4">
+<div className="border rounded-xl p-10 flex flex-col items-center gap-6">
 
 <p className="text-muted-foreground">
-Connect your YouTube channel to view private analytics
+Connect your YouTube channel to unlock analytics
 </p>
 
 <button
 onClick={connectYoutube}
-className="bg-red-600 text-white px-6 py-3 rounded-lg"
+className="bg-red-600 text-white px-8 py-3 rounded-lg text-lg"
 >
 Connect YouTube
 </button>
@@ -99,6 +130,10 @@ Connect YouTube
 
 }
 
+/* -------------------------- */
+/* CONNECTED → SHOW DASHBOARD */
+/* -------------------------- */
+
 const stats = data?.stats || {
 subscriberCount:0,
 viewCount:0,
@@ -108,7 +143,7 @@ videoCount:0
 const videos = data?.videos || []
 const history = data?.history || []
 
-/* ENGAGEMENT RATE */
+/* ENGAGEMENT */
 
 let totalLikes = 0
 let totalViews = 0
@@ -128,27 +163,20 @@ totalViews > 0
 const viewChart =
 history.length > 0
 ? history.map((h:any)=>({
-  date: new Date(h.date).toLocaleDateString(),
-  value: Number(h.views)
+date:new Date(h.date).toLocaleDateString(),
+value:Number(h.views)
 }))
-: [{
-  date: "Today",
-  value: Number(stats.viewCount)
-}]
+: [{date:"Today",value:Number(stats.viewCount)}]
 
-const subscriberChart = [
-{
+const subscriberChart = [{
 date:"Today",
 value:Number(stats.subscriberCount)
-}
-]
+}]
 
-const videoChart = [
-{
+const videoChart = [{
 date:"Today",
 value:Number(stats.videoCount)
-}
-]
+}]
 
 return(
 
@@ -158,9 +186,22 @@ return(
 Private YouTube Analytics
 </h2>
 
-<div className="text-green-500 font-medium">
+<div className="flex items-center gap-4">
+
+<span className="text-green-500 font-medium">
 YouTube Connected ✅
+</span>
+
+<button
+onClick={connectYoutube}
+className="bg-red-600 text-white px-3 py-1 rounded"
+>
+Reconnect
+</button>
+
 </div>
+
+{/* STATS */}
 
 <div className="grid md:grid-cols-4 gap-4">
 
@@ -170,7 +211,7 @@ YouTube Connected ✅
 </div>
 
 <div className="border p-4 rounded-lg">
-<h3 className="text-sm text-muted-foreground"> Daily Views</h3>
+<h3 className="text-sm text-muted-foreground">Daily Views</h3>
 <p className="text-2xl font-bold">{stats.viewCount}</p>
 </div>
 
@@ -186,6 +227,7 @@ YouTube Connected ✅
 
 </div>
 
+{/* CHARTS */}
 
 <div className="grid md:grid-cols-3 gap-6">
 
@@ -199,7 +241,7 @@ Subscriber Growth
 
 <LineChart data={subscriberChart}>
 
-<XAxis dataKey="date" tick={{fontSize:10}} />
+<XAxis dataKey="date"/>
 <YAxis/>
 <Tooltip/>
 
@@ -274,6 +316,8 @@ strokeWidth={3}
 
 </div>
 
+{/* RECENT VIDEOS */}
+
 <div className="border rounded-xl p-6">
 
 <h3 className="mb-6 font-semibold">
@@ -284,7 +328,7 @@ Recent Videos
 
 {videos.map((video:any)=>{
 
-const id = video.id || video.id?.videoId
+const id = video.id?.videoId || video.id
 
 return(
 
@@ -320,6 +364,7 @@ className="rounded-lg w-40"
 
 </div>
 
+{/* AI SUGGESTIONS */}
 
 <div className="border rounded-xl p-6">
 
@@ -328,9 +373,13 @@ AI Content Suggestions
 </h3>
 
 <div className="text-sm leading-relaxed space-y-2">
-{data?.suggestions?.split("\n").map((line:string,i:number)=>(
+
+{data?.suggestions
+? data.suggestions.split("\n").map((line:string,i:number)=>(
 <p key={i}>{line}</p>
-))}
+))
+: <p>No suggestions available yet.</p>}
+
 </div>
 
 </div>

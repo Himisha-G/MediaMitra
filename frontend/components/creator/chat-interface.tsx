@@ -1,9 +1,11 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Send, Paperclip, Bot, User, Compass, Sparkles } from "lucide-react"
+import { Send, Paperclip, Bot, User, Compass } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { fetchAuthSession } from "aws-amplify/auth"
+import ReactMarkdown from "react-markdown"
+import { VoiceChat } from "./voice-chat"
 
 interface FileData {
   name: string
@@ -32,7 +34,9 @@ export function ChatInterface() {
   const [files,setFiles] = useState<FileData[]>([])
   const [loading,setLoading] = useState(false)
   const [showFeatures,setShowFeatures] = useState(false)
+
   const fileRef = useRef<HTMLInputElement>(null)
+
 
   // ---------- FILE UPLOAD ----------
 
@@ -64,6 +68,7 @@ export function ChatInterface() {
     setFiles(prev=>[...prev,...newFiles])
   }
 
+
   // ---------- CHAT SEND ----------
 
   const sendMessage = async ()=>{
@@ -78,6 +83,7 @@ export function ChatInterface() {
     }
 
     setMessages(prev=>[...prev,userMsg])
+
     setInput("")
     setLoading(true)
 
@@ -133,6 +139,7 @@ export function ChatInterface() {
     setLoading(false)
   }
 
+
   // ---------- NICHE BUTTON ----------
 
   const handleNiche = async ()=>{
@@ -171,13 +178,13 @@ export function ChatInterface() {
       ])
 
     }catch(err){
-
       console.error(err)
-
     }
 
     setLoading(false)
   }
+
+
 
   // ---------- UI ----------
 
@@ -187,39 +194,41 @@ export function ChatInterface() {
 
       <div className="mx-auto w-full max-w-3xl h-full flex flex-col">
 
+
         {/* HEADER */}
 
         <header className="p-5 border-b border-gray-800 flex items-center justify-between">
 
-  <div className="flex items-center gap-3">
-    <Bot className="text-[#00C9A7]" />
-    <h1 className="font-bold text-lg">MediaMitra AI</h1>
-  </div>
+          <div className="flex items-center gap-3">
+            <Bot className="text-[#00C9A7]" />
+            <h1 className="font-bold text-lg">MediaMitra AI</h1>
+          </div>
 
-  <div className="flex gap-2">
+          <div className="flex gap-2">
 
-    <Button
-      variant="outline"
-      size="sm"
-      className="border-[#00C9A7] text-[#00C9A7]"
-      onClick={()=>setShowFeatures(true)}
-    >
-      Features
-    </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-[#00C9A7] text-[#00C9A7]"
+              onClick={()=>setShowFeatures(true)}
+            >
+              Features
+            </Button>
 
-    <Button
-      variant="outline"
-      size="sm"
-      className="border-[#00C9A7] text-[#00C9A7]"
-      onClick={handleNiche}
-    >
-      <Compass className="h-4 w-4 mr-2"/>
-      Find My Niche
-    </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-[#00C9A7] text-[#00C9A7]"
+              onClick={handleNiche}
+            >
+              <Compass className="h-4 w-4 mr-2"/>
+              Find My Niche
+            </Button>
 
-  </div>
+          </div>
 
-</header>
+        </header>
+
 
 
         {/* CHAT AREA */}
@@ -240,9 +249,28 @@ export function ChatInterface() {
 
     </div>
 
-    <div className="max-w-[80%] p-4 rounded-2xl bg-[#1E1E1E] text-sm">
+    <div className="max-w-[80%] p-4 rounded-2xl bg-[#1E1E1E] text-sm leading-relaxed whitespace-pre-wrap">
 
-      {msg.content}
+      {msg.role === "bot" ? (
+
+        <ReactMarkdown
+          components={{
+            p: ({children}) => <p className="mb-3">{children}</p>,
+            h1: ({children}) => <h1 className="text-lg font-bold mb-3">{children}</h1>,
+            h2: ({children}) => <h2 className="text-md font-semibold mb-2">{children}</h2>,
+            ul: ({children}) => <ul className="list-disc ml-6 mb-3">{children}</ul>,
+            li: ({children}) => <li className="mb-1">{children}</li>,
+            strong: ({children}) => <strong className="text-[#00C9A7]">{children}</strong>
+          }}
+        >
+          {msg.content}
+        </ReactMarkdown>
+
+      ) : (
+
+        <p>{msg.content}</p>
+
+      )}
 
       {msg.files && (
         <div className="text-xs mt-2 opacity-60">
@@ -264,7 +292,8 @@ export function ChatInterface() {
 </main>
 
 
-{/* FEATURES SLIDE PANEL */}
+
+{/* FEATURES PANEL */}
 
 <div
 className={`fixed top-0 right-0 h-full w-[320px] bg-[#0B0E11] border-l border-gray-800 shadow-xl transform transition-transform duration-300 z-50 ${showFeatures ? "translate-x-0" : "translate-x-full"}`}
@@ -273,6 +302,7 @@ className={`fixed top-0 right-0 h-full w-[320px] bg-[#0B0E11] border-l border-gr
 <div className="p-6 flex flex-col gap-6">
 
   <div className="flex justify-between items-center">
+
     <h2 className="text-lg font-bold text-[#00C9A7]">
       MediaMitra Features
     </h2>
@@ -283,6 +313,7 @@ className={`fixed top-0 right-0 h-full w-[320px] bg-[#0B0E11] border-l border-gr
     >
       ✕
     </button>
+
   </div>
 
   <ul className="space-y-4 text-sm">
@@ -314,43 +345,46 @@ className={`fixed top-0 right-0 h-full w-[320px] bg-[#0B0E11] border-l border-gr
 </div>
 
 
-        {/* INPUT */}
 
-        <footer className="p-5 flex gap-2">
+{/* INPUT */}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={()=>fileRef.current?.click()}
-          >
-            <Paperclip/>
-          </Button>
+<footer className="p-5 flex gap-2">
 
-          <input
-            type="file"
-            ref={fileRef}
-            hidden
-            multiple
-            accept="image/*"
-            onChange={handleFileUpload}
-          />
+<Button
+variant="ghost"
+size="icon"
+onClick={()=>fileRef.current?.click()}
+>
+<Paperclip/>
+</Button>
 
-          <input
-            className="flex-1 bg-[#1E1E1E] rounded-xl p-3"
-            value={input}
-            onChange={e=>setInput(e.target.value)}
-            onKeyDown={e=>e.key==="Enter" && sendMessage()}
-            placeholder="Ask MediaMitra anything..."
-          />
+<VoiceChat/>
 
-          <button
-            onClick={sendMessage}
-            className="bg-[#00C9A7] p-3 rounded-xl"
-          >
-            <Send/>
-          </button>
+<input
+type="file"
+ref={fileRef}
+hidden
+multiple
+accept="image/*"
+onChange={handleFileUpload}
+/>
 
-        </footer>
+<input
+className="flex-1 bg-[#1E1E1E] rounded-xl p-3"
+value={input}
+onChange={e=>setInput(e.target.value)}
+onKeyDown={e=>e.key==="Enter" && sendMessage()}
+placeholder="Ask MediaMitra anything..."
+/>
+
+<button
+onClick={sendMessage}
+className="bg-[#00C9A7] p-3 rounded-xl"
+>
+<Send/>
+</button>
+
+</footer>
 
       </div>
 
