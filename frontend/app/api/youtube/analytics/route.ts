@@ -103,7 +103,6 @@ export async function GET(req: Request) {
           likeCount: 0
         }
       }))
-
     }
 
     /* ---------------------------
@@ -113,80 +112,8 @@ export async function GET(req: Request) {
 
     const today = new Date().toISOString().split("T")[0]
 
-const start = new Date()
-start.setDate(start.getDate() - 30)
-
-const startDate = start.toISOString().split("T")[0]
-
     const analyticsUrl =
       `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE&startDate=2024-01-01&endDate=${today}&metrics=views&dimensions=day`
-    
-
-    /* ---------------------------
-   TRAFFIC SOURCES
----------------------------- */
-
-const trafficRes = await fetch(
-    `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE&startDate=${startDate}&endDate=${today}&metrics=views&dimensions=insightTrafficSourceType`,
-    {
-     headers:{
-      Authorization:`Bearer ${accessToken}`
-     }
-    })
-    
-    const trafficData = await trafficRes.json()
-    
-    const trafficSources = trafficData.rows?.map((r:any)=>({
-        source:r[0],
-        views:r[1]
-       })) || [
-        {source:"YouTube Search",views:10},
-        {source:"Suggested Videos",views:5},
-        {source:"External",views:2}
-       ]
-    /* ---------------------------
-   DEVICE TYPE
----------------------------- */
-
-const deviceRes = await fetch(
-    `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE&startDate=${startDate}&endDate=${today}&metrics=views&dimensions=deviceType`,
-    {
-     headers:{
-      Authorization:`Bearer ${accessToken}`
-     }
-    })
-    
-    const deviceData = await deviceRes.json()
-    
-    const devices = deviceData.rows?.map((r:any)=>({
-        device:r[0],
-        views:r[1]
-       })) || [
-        {device:"MOBILE",views:12},
-        {device:"DESKTOP",views:3},
-        {device:"TABLET",views:1}
-       ]
-
-       
-    /* ---------------------------
-   WATCH TIME
----------------------------- */
-
-const watchRes = await fetch(
-    `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE&startDate=2024-01-01&endDate=${today}&metrics=estimatedMinutesWatched&dimensions=day`,
-    {
-     headers:{
-      Authorization:`Bearer ${accessToken}`
-     }
-    })
-    
-    const watchData = await watchRes.json()
-    
-    const watchHistory = watchData.rows?.map((r:any)=>({
-     date:r[0],
-     minutes:r[1]
-    })) || []
-
 
     const analyticsRes = await fetch(analyticsUrl, {
       headers: {
@@ -244,14 +171,11 @@ const watchRes = await fetch(
     ---------------------------- */
 
     return NextResponse.json({
-        stats,
-        videos,
-        history,
-        watchHistory,
-        trafficSources,
-        devices,
-        suggestions
-       })
+      stats,
+      videos,
+      history,
+      suggestions
+    })
 
   } catch (err) {
 

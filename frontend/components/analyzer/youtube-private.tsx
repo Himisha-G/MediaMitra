@@ -1,20 +1,17 @@
 "use client"
 
+console.log("YoutubePrivate rendered")
+
 import { useEffect, useState } from "react"
 import { fetchAuthSession } from "aws-amplify/auth"
 import {
-LineChart,
-Line,
-XAxis,
-YAxis,
-Tooltip,
-ResponsiveContainer
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
 } from "recharts"
-import {
-    PieChart,
-    Pie,
-    Cell
-   } from "recharts"
 
 export function YoutubePrivate(){
 
@@ -22,7 +19,7 @@ const [userId,setUserId] = useState<string|null>(null)
 const [connected,setConnected] = useState(false)
 const [data,setData] = useState<any>(null)
 const [loading,setLoading] = useState(true)
-const COLORS = ["#22c55e","#3b82f6","#f59e0b","#ef4444","#8b5cf6"]
+
 useEffect(()=>{
 
 async function init(){
@@ -276,60 +273,6 @@ strokeWidth={3}
 </div>
 
 </div>
-<div className="grid md:grid-cols-2 gap-6">
-
-{/* Traffic Sources */}
-
-<div className="border rounded-xl p-6">
-
-<h3 className="mb-4 font-semibold">
-Traffic Sources
-</h3>
-
-
-
-<PieChart width={300} height={220}>
-<Pie
- data={data?.trafficSources || []}
- dataKey="views"
- nameKey="source"
- outerRadius={80}
- label
->
-{(data?.trafficSources || []).map((entry:any,index:number)=>(
-<Cell key={index} fill={COLORS[index % COLORS.length]} />
-))}
-</Pie>
-</PieChart>
-
-</div>
-
-
-{/* Device Type */}
-
-<div className="border rounded-xl p-6">
-
-<h3 className="mb-4 font-semibold">
-Device Types
-</h3>
-
-<PieChart width={300} height={220}>
-<Pie
- data={data?.devices || []}
- dataKey="views"
- nameKey="device"
- outerRadius={80}
- label
->
-{(data?.devices || []).map((entry:any,index:number)=>(
-<Cell key={index} fill={COLORS[index % COLORS.length]} />
-))}
-</Pie>
-</PieChart>
-
-</div>
-
-</div>
 
 <div className="border rounded-xl p-6">
 
@@ -385,9 +328,9 @@ AI Content Suggestions
 </h3>
 
 <div className="text-sm leading-relaxed space-y-2">
-  {data?.suggestions?.split("\n").map((line: string, i: number) => (
-    <p key={i}>{line}</p>
-  )) || "AI suggestions unavailable"}
+{data?.suggestions?.split("\n").map((line:string,i:number)=>(
+<p key={i}>{line}</p>
+))}
 </div>
 
 </div>
