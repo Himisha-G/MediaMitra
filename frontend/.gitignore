@@ -8,3 +8,18 @@ node_modules/
 .next/
 .env*.local
 .DS_Store
+
+# Dependency directories
+node_modules/
+**/node_modules/
+
+# Next.js build output
+.next/
+**/ .next/
+
+# Lock files (optional, but helps if you want to avoid version mismatches)
+package-lock.json
+**/package-lock.json
+
+# Environment variables
+.env*
