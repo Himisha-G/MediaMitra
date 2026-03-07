@@ -45,6 +45,25 @@ setLoading(false)
 
 }
 
+const categories = data?.audience_analysis?.category_distribution || {}
+
+const categoryData = [
+{name:"Praise", value: categories.Praise || 0},
+{name:"Criticism", value: categories.Criticism || 0},
+{name:"Hate", value: categories.Hate || 0},
+{name:"Spam", value: categories.Spam || 0},
+{name:"Support", value: categories.Support || 0},
+{name:"Question", value: categories.Question || 0}
+]
+
+const sentiment = data?.audience_analysis?.sentiment_distribution || {}
+
+const sentimentData = [
+{name:"Positive", value:(sentiment.positive || 0)*100},
+{name:"Neutral", value:(sentiment.neutral || 0)*100},
+{name:"Negative", value:(sentiment.negative || 0)*100}
+]
+
 return(
 
 <div className="space-y-8">
@@ -116,6 +135,10 @@ Comments: {metadata.comments}
 {data?.content_signals?.engagement_score || 0}/100
 </div>
 
+<div className="text-sm text-gray-400 mt-2">
+Engagement Rate: {data?.content_signals?.engagement_rate}
+</div>
+
 </div>
 
 
@@ -140,11 +163,7 @@ Comments: {metadata.comments}
 <PieChart>
 
 <Pie
-data={[
-{name:"Positive",value:data?.audience_analysis?.sentiment_distribution?.positive || 0},
-{name:"Neutral",value:data?.audience_analysis?.sentiment_distribution?.neutral || 0},
-{name:"Negative",value:data?.audience_analysis?.sentiment_distribution?.negative || 0}
-]}
+data={sentimentData}
 dataKey="value"
 outerRadius={80}
 >
@@ -171,14 +190,7 @@ outerRadius={80}
 
 <ResponsiveContainer width="100%" height={250}>
 
-<BarChart
-data={[
-{name:"Praise",value:data?.audience_analysis?.category_distribution?.Praise || 0},
-{name:"Criticism",value:data?.audience_analysis?.category_distribution?.Criticism || 0},
-{name:"Hate",value:data?.audience_analysis?.category_distribution?.Hate || 0},
-{name:"Spam",value:data?.audience_analysis?.category_distribution?.Spam || 0}
-]}
->
+<BarChart data={categoryData}>
 
 <XAxis dataKey="name"/>
 <YAxis/>
