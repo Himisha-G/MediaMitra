@@ -48,13 +48,14 @@ setLoading(false)
 const categories = data?.audience_analysis?.category_distribution || {}
 
 const categoryData = [
-{name:"Praise", value: categories.Praise || 0},
-{name:"Criticism", value: categories.Criticism || 0},
-{name:"Hate", value: categories.Hate || 0},
-{name:"Spam", value: categories.Spam || 0},
-{name:"Support", value: categories.Support || 0},
-{name:"Question", value: categories.Question || 0}
-]
+  {name:"Praise", value: categories.Praise || 0},
+  {name:"Criticism", value: categories.Criticism || 0},
+  {name:"Hate", value: categories.Hate || 0},
+  {name:"Emotional", value: categories.Emotional || 0},
+  {name:"Spam", value: categories.Spam || 0},
+  {name:"Support", value: categories.Support || 0},
+  {name:"Question", value: categories.Question || 0}
+  ]
 
 const sentiment = data?.audience_analysis?.sentiment_distribution || {}
 
