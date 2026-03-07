@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Send, Paperclip, Bot, User, Compass } from "lucide-react"
+import { Send, Paperclip, Bot, User, Compass, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { fetchAuthSession } from "aws-amplify/auth"
 
@@ -31,7 +31,7 @@ export function ChatInterface() {
   const [input,setInput] = useState("")
   const [files,setFiles] = useState<FileData[]>([])
   const [loading,setLoading] = useState(false)
-
+  const [showFeatures,setShowFeatures] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // ---------- FILE UPLOAD ----------
@@ -191,64 +191,127 @@ export function ChatInterface() {
 
         <header className="p-5 border-b border-gray-800 flex items-center justify-between">
 
-          <div className="flex items-center gap-3">
-            <Bot className="text-[#00C9A7]" />
-            <h1 className="font-bold text-lg">MediaMitra AI</h1>
-          </div>
+  <div className="flex items-center gap-3">
+    <Bot className="text-[#00C9A7]" />
+    <h1 className="font-bold text-lg">MediaMitra AI</h1>
+  </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-[#00C9A7] text-[#00C9A7]"
-            onClick={handleNiche}
-          >
-            <Compass className="h-4 w-4 mr-2"/>
-            Find My Niche
-          </Button>
+  <div className="flex gap-2">
 
-        </header>
+    <Button
+      variant="outline"
+      size="sm"
+      className="border-[#00C9A7] text-[#00C9A7]"
+      onClick={()=>setShowFeatures(true)}
+    >
+      Features
+    </Button>
+
+    <Button
+      variant="outline"
+      size="sm"
+      className="border-[#00C9A7] text-[#00C9A7]"
+      onClick={handleNiche}
+    >
+      <Compass className="h-4 w-4 mr-2"/>
+      Find My Niche
+    </Button>
+
+  </div>
+
+</header>
 
 
         {/* CHAT AREA */}
 
         <main className="flex-1 overflow-y-auto p-6 space-y-6">
 
-          {messages.map(msg=>(
-            <div
-              key={msg.id}
-              className={`flex gap-4 ${msg.role==="user"?"flex-row-reverse":""}`}
-            >
+{messages.map(msg=>(
+  <div
+    key={msg.id}
+    className={`flex gap-4 ${msg.role==="user"?"flex-row-reverse":""}`}
+  >
 
-              <div className="h-10 w-10 rounded-full flex items-center justify-center bg-[#1E1E1E]">
+    <div className="h-10 w-10 rounded-full flex items-center justify-center bg-[#1E1E1E]">
 
-                {msg.role==="user"
-                  ? <User/>
-                  : <Bot className="text-[#00C9A7]"/>}
+      {msg.role==="user"
+        ? <User/>
+        : <Bot className="text-[#00C9A7]"/>}
 
-              </div>
+    </div>
 
-              <div className="max-w-[80%] p-4 rounded-2xl bg-[#1E1E1E] text-sm">
+    <div className="max-w-[80%] p-4 rounded-2xl bg-[#1E1E1E] text-sm">
 
-                {msg.content}
+      {msg.content}
 
-                {msg.files && (
-                  <div className="text-xs mt-2 opacity-60">
-                    {msg.files.join(", ")}
-                  </div>
-                )}
+      {msg.files && (
+        <div className="text-xs mt-2 opacity-60">
+          {msg.files.join(", ")}
+        </div>
+      )}
 
-              </div>
+    </div>
 
-            </div>
-          ))}
+  </div>
+))}
 
-          {loading && (
-            <p className="text-xs text-[#00C9A7]">
-              MediaMitra thinking...
-            </p>
-          )}
+{loading && (
+  <p className="text-xs text-[#00C9A7]">
+    MediaMitra thinking...
+  </p>
+)}
 
-        </main>
+</main>
+
+
+{/* FEATURES SLIDE PANEL */}
+
+<div
+className={`fixed top-0 right-0 h-full w-[320px] bg-[#0B0E11] border-l border-gray-800 shadow-xl transform transition-transform duration-300 z-50 ${showFeatures ? "translate-x-0" : "translate-x-full"}`}
+>
+
+<div className="p-6 flex flex-col gap-6">
+
+  <div className="flex justify-between items-center">
+    <h2 className="text-lg font-bold text-[#00C9A7]">
+      MediaMitra Features
+    </h2>
+
+    <button
+      onClick={()=>setShowFeatures(false)}
+      className="text-gray-400 hover:text-white"
+    >
+      ✕
+    </button>
+  </div>
+
+  <ul className="space-y-4 text-sm">
+
+    <li className="bg-[#1E1E1E] p-3 rounded-xl">
+      🌍 <b>Multilingual</b>
+    </li>
+
+    <li className="bg-[#1E1E1E] p-3 rounded-xl">
+      ✍️ <b>Platform-Specific Script Writing</b>
+    </li>
+
+    <li className="bg-[#1E1E1E] p-3 rounded-xl">
+      🧠 <b>Persona-Aware Content Generation</b>
+    </li>
+
+    <li className="bg-[#1E1E1E] p-3 rounded-xl">
+      🔎 <b>Niche Discovery & Refinement</b>
+    </li>
+
+    <li className="bg-[#1E1E1E] p-3 rounded-xl">
+      🚀 <b>Built-in Motivation Layer</b>
+    </li>
+
+  </ul>
+
+</div>
+
+</div>
 
 
         {/* INPUT */}
