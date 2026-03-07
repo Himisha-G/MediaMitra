@@ -22,4 +22,4 @@ package-lock.json
 **/package-lock.json
 
 # Environment variables
-.env*
+.env*.DS_Store
