@@ -8,7 +8,7 @@ import { YoutubePublicDashboard } from "./youtube-public-dashboard"
 import { YoutubePrivate } from "./youtube-private"
 type View = "home" | "public" | "private"
 
-export function YoutubeDashboard() {
+export function YoutubeDashboard({ onBack }: { onBack: () => void }) {
   const [view, setView] = useState<View>("home")
 
   useEffect(() => {
@@ -61,6 +61,13 @@ export function YoutubeDashboard() {
 
   return (
     <div className="px-6 py-8">
+        <button
+      onClick={onBack}
+      className="flex items-center gap-2 text-sm mb-6 text-muted-foreground hover:text-white transition"
+    >
+      <ArrowLeft className="h-4 w-4" />
+      Back to Analyzer
+    </button>
       <h1 className="text-3xl font-bold mb-6">YouTube Analyzer</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

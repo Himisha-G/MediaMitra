@@ -4,12 +4,19 @@ import { FaPinterest, FaSpotify } from "react-icons/fa"
 import { useState } from "react"
 import { YoutubeIcon, Instagram, MessageSquare } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-
+import { InstagramDashboard } from "./instagram-dashboard"
+import { SpotifyDashboard } from "./spotify-dashboard"
 import { YoutubeDashboard } from "./youtube-dashboard"
 import { RedditDashboard } from "./reddit-dashboard"
 import { PinterestDashboard } from "./pinterest-dashboard"
 
-type Platform = "youtube" | "pinterest" | "reddit" | "instagram" | "spotify" | null
+type Platform =
+  | "youtube"
+  | "pinterest"
+  | "reddit"
+  | "instagram"
+  | "spotify"
+  | null
 
 const platforms = [
   {
@@ -41,15 +48,28 @@ const platforms = [
     icon: FaSpotify,
     key: "spotify",
     description: "Analyze tracks, playlists and listener growth",
-  }
+  },
 ]
 
 export function AnalyzerDashboard() {
   const [activePlatform, setActivePlatform] = useState<Platform>(null)
 
-  if (activePlatform === "youtube") return <YoutubeDashboard />
-  if (activePlatform === "reddit") return <RedditDashboard />
-  if (activePlatform === "pinterest") return <PinterestDashboard />
+  /* DASHBOARD ROUTING */
+
+  if (activePlatform === "spotify")
+    return <SpotifyDashboard onBack={() => setActivePlatform(null)} />
+
+  if (activePlatform === "reddit")
+    return <RedditDashboard onBack={() => setActivePlatform(null)} />
+
+  if (activePlatform === "pinterest")
+    return <PinterestDashboard onBack={() => setActivePlatform(null)} />
+
+  if (activePlatform === "youtube")
+    return <YoutubeDashboard onBack={() => setActivePlatform(null)} />
+  if (activePlatform === "instagram")
+    return <InstagramDashboard onBack={() => setActivePlatform(null)} />
+  /* MAIN ANALYZER PAGE */
 
   return (
     <div className="px-6 py-10">
@@ -90,6 +110,7 @@ export function AnalyzerDashboard() {
           })}
 
         </div>
+
       </div>
     </div>
   )

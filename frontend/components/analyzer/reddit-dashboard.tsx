@@ -79,11 +79,16 @@ const influencers = [
 
 
 
-export function RedditDashboard() {
+export function RedditDashboard({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="px-6 py-10 space-y-8">
-
+<button
+  onClick={onBack}
+  className="flex items-center gap-2 text-sm mb-6 text-muted-foreground hover:text-white transition"
+>
+  ← Back to Analyzer
+</button>
       <h1 className="text-3xl font-bold">
         Reddit Community Insights
       </h1>
