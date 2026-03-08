@@ -18,11 +18,11 @@ Amplify.configure({
           // Matches the 'Allowed callback/sign-out URLs' in your AWS Console screenshot
           redirectSignIn: [
             "http://localhost:3000/",
-            "https://main.d3qsdg65dn72cr.amplifyapp.com",
+            "https://main.d3qsdg65dn72cr.amplifyapp.com/",
           ],
           redirectSignOut: [
             "http://localhost:3000/",
-            "https://main.d3qsdg65dn72cr.amplifyapp.com",
+            "https://main.d3qsdg65dn72cr.amplifyapp.com/",
           ],
           responseType: "code"
         }
