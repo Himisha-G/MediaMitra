@@ -1,19 +1,23 @@
-import * as React from 'react'
+"use client"
 
-const MOBILE_BREAKPOINT = 768
+import { signInWithRedirect } from "aws-amplify/auth"
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+export default function LoginPage() {
 
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener('change', onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener('change', onChange)
-  }, [])
+  const handleLogin = async () => {
+    await signInWithRedirect()
+  }
 
-  return !!isMobile
+  return (
+    <div className="flex flex-col items-center justify-center h-screen gap-6">
+      <h1 className="text-xl">Login to MediaMitra</h1>
+
+      <button
+        onClick={handleLogin}
+        className="bg-green-500 px-6 py-3 rounded text-black"
+      >
+        Login / Signup
+      </button>
+    </div>
+  )
 }
