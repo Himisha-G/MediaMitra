@@ -347,7 +347,27 @@ className={`fixed top-0 right-0 h-full w-[320px] bg-[#0B0E11] border-l border-gr
 
 
 {/* INPUT */}
+{files.length > 0 && (
+  <div className="px-5 pb-2 flex flex-col gap-2 items-start">
+    {files.map((file, index) => (
+      <div
+        key={index}
+        className="bg-[#1E1E1E] text-xs px-3 py-2 rounded-xl flex items-center gap-2 max-w-fit"
+      >
+        📎 {file.name}
 
+        <button
+          onClick={() =>
+            setFiles(prev => prev.filter((_, i) => i !== index))
+          }
+          className="text-red-400 hover:text-red-300 ml-2"
+        >
+          ✕
+        </button>
+      </div>
+    ))}
+  </div>
+)}
 <footer className="p-5 flex gap-2">
 
 <Button
