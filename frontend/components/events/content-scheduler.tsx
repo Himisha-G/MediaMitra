@@ -115,8 +115,8 @@ setDate("")
 setTime("")
 
 await loadEvents()
-setToast("✅ Content scheduled. 📧 Confirmation email sent.")
-setTimeout(() => setToast(null), 3000)
+setToast("✅ Content scheduled. 📧 Confirmation email sent. Mail will be sent only to verified mails according to AWS policies.")
+setTimeout(() => setToast(null), 5000)
 }catch(err){
 console.error(err)
 }
