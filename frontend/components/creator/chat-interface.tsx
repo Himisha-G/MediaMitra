@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Send, Paperclip, Bot, User, Compass, Mic, Loader2, Square, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { fetchAuthSession } from "aws-amplify/auth"
@@ -144,6 +144,19 @@ export function ChatInterface() {
   const [showFeatures, setShowFeatures] = useState(false)
 
   const fileRef = useRef<HTMLInputElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // ---------- AUTO SCROLL ----------
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, loading])
+
+  // ---------- FILE UPLOAD ----------
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files
@@ -335,10 +348,19 @@ export function ChatInterface() {
               </div>
             </div>
           ))}
-          {loading && <p className="text-xs text-[#00C9A7] animate-pulse">MediaMitra thinking...</p>}
+          {loading && (
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 shrink-0 rounded-full flex items-center justify-center bg-[#1E1E1E]">
+                <Bot className="text-[#00C9A7] h-4 w-4 animate-bounce" />
+              </div>
+              <p className="text-xs text-[#00C9A7] animate-pulse">MediaMitra thinking...</p>
+            </div>
+          )}
+          {/* SCROLL ANCHOR */}
+          <div ref={messagesEndRef} />
         </main>
 
-        {/* FEATURES PANEL (REDACTED FOR BREVITY - SAME AS ORIGINAL) */}
+        {/* FEATURES PANEL */}
         <div className={`fixed top-0 right-0 h-full w-[320px] bg-[#0B0E11] border-l border-gray-800 shadow-xl transform transition-transform duration-300 z-50 ${showFeatures ? "translate-x-0" : "translate-x-full"}`}>
            <div className="p-6 flex flex-col gap-6">
               <div className="flex justify-between items-center">
