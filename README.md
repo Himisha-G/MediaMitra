@@ -174,13 +174,7 @@ And that is exactly what **MediaMitra aims to provide.**
 
 ---
 
-# 👩‍💻 Team
 
-Built for **AI for Bharat Hackathon**
-
-Team MediaMitra
-
----
 
 # 📌 Future Improvements
 
